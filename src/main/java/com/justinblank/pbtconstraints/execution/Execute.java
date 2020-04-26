@@ -16,7 +16,7 @@ import static com.justinblank.pbtconstraints.variables.IVar.intVar;
 
 public class Execute {
 
-    public static Optional<Pair<Integer, Integer>> check(Pair<IVar, IVar> cVars, BiFunction<Integer, Integer, Boolean> test) {
+    public static Optional<Pair<Integer, Integer>> check(Pair<? extends Variable, ? extends Variable> cVars, BiFunction<Integer, Integer, Boolean> test) {
         var constraints = new ConstraintSet(cVars.getLeft(), cVars.getRight());
         var vars = new HashMap<String, IntVar>();
 
@@ -56,6 +56,9 @@ public class Execute {
         vars.getLeft().boundBy(0, 5);
         vars.getRight().boundBy(0, 20);
 
+
         System.out.println(check(vars, (a, b) -> (b - a) < 5));
+
+        System.out.println(Check.check((Integer x) -> x + 2, Integer.class).isMonotonic());
     }
 }

@@ -13,12 +13,12 @@ public class ConstraintSet {
     public ConstraintSet(IVar v1) {
     }
 
-    public ConstraintSet(IVar v1, IVar v2) {
-        for (Condition<IVar> condition : v1.conditions()) {
-            addConstraint(new Constraint<>(v1, condition));
+    public ConstraintSet(Variable<?> v1, Variable<?> v2) {
+        for (Condition<?> condition : v1.conditions()) {
+            addConstraint(new Constraint(v1, condition));
         }
-        for (Condition<IVar> condition : v2.conditions()) {
-            addConstraint(new Constraint<>(v2, condition));
+        for (Condition<?> condition : v2.conditions()) {
+            addConstraint(new Constraint(v2, condition));
         }
     }
 

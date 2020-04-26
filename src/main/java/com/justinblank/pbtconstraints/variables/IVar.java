@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public record IVar(String name, Set<Condition<IVar>> conditions) implements Variable {
+public record IVar(String name, Set<Condition<IVar>> conditions) implements Variable<IVar> {
 
     public static IVar intVar() {
         return new IVar(NameFactory.newName(), new HashSet<>());
@@ -29,6 +29,11 @@ public record IVar(String name, Set<Condition<IVar>> conditions) implements Vari
         return this;
     }
 
+    @Override
+    public IVar copy() {
+        return new IVar(NameFactory.newName(), new HashSet<>(conditions));
+    }
+
     public Pair<IVar, IVar> lt(IVar var) {
         this.conditions.add(LessThan.ltCondition(var));
         return Pair.of(this, var);
@@ -44,6 +49,7 @@ public record IVar(String name, Set<Condition<IVar>> conditions) implements Vari
         return Pair.of(this, var);
     }
 
+    @Override
     public Set<Condition<IVar>> conditions() {
         return Collections.unmodifiableSet(conditions);
     }
