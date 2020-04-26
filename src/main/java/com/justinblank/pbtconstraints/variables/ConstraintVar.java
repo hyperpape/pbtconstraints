@@ -6,7 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Set;
 
-public interface Variable<T extends Variable<T>> extends ConstraintSource {
+public interface ConstraintVar<T extends ConstraintVar<T>> extends ConstraintSource {
     String name();
 
     Set<Condition<T>> conditions();
@@ -17,9 +17,12 @@ public interface Variable<T extends Variable<T>> extends ConstraintSource {
 
     T copy();
 
-        static Variable fromClass(Class<?> c) {
+    static ConstraintVar fromClass(Class<?> c) {
         if (c == Integer.class) {
             return IVar.intVar();
+        }
+        else if (c == Double.class) {
+            return DVar.doubleVar();
         }
         throw new IllegalArgumentException("Class not supported yet");
     }

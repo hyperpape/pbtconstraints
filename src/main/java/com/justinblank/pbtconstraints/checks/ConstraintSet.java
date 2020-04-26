@@ -1,8 +1,7 @@
 package com.justinblank.pbtconstraints.checks;
 
 import com.justinblank.pbtconstraints.variables.IVar;
-import com.justinblank.pbtconstraints.variables.Variable;
-import org.chocosolver.solver.variables.IntVar;
+import com.justinblank.pbtconstraints.variables.ConstraintVar;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -13,7 +12,7 @@ public class ConstraintSet {
     public ConstraintSet(IVar v1) {
     }
 
-    public ConstraintSet(Variable<?> v1, Variable<?> v2) {
+    public ConstraintSet(ConstraintVar<?> v1, ConstraintVar<?> v2) {
         for (Condition<?> condition : v1.conditions()) {
             addConstraint(new Constraint(v1, condition));
         }
@@ -32,7 +31,7 @@ public class ConstraintSet {
         return Collections.unmodifiableSet(constraints);
     }
 
-    public Set<Variable> variables() {
+    public Set<ConstraintVar> variables() {
         return new HashSet<>();
     }
 }

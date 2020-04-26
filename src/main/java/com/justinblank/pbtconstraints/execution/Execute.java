@@ -2,63 +2,87 @@ package com.justinblank.pbtconstraints.execution;
 
 import com.justinblank.pbtconstraints.checks.*;
 import com.justinblank.pbtconstraints.variables.ConstantValue;
+import com.justinblank.pbtconstraints.variables.ConstraintVar;
+import com.justinblank.pbtconstraints.variables.DVar;
 import com.justinblank.pbtconstraints.variables.IVar;
-import com.justinblank.pbtconstraints.variables.Variable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.solver.variables.RealVar;
+import org.chocosolver.solver.variables.Variable;
 
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-import static com.justinblank.pbtconstraints.variables.IVar.intVar;
-
 public class Execute {
 
-    public static Optional<Pair<Integer, Integer>> check(Pair<? extends Variable, ? extends Variable> cVars, BiFunction<Integer, Integer, Boolean> test) {
+    public static <T, S> Optional<Pair<T, S>> falsify(Pair<? extends ConstraintVar, ? extends ConstraintVar> cVars, BiFunction<T, S, Boolean> test) {
         var constraints = new ConstraintSet(cVars.getLeft(), cVars.getRight());
-        var vars = new HashMap<String, IntVar>();
+        var vars = new HashMap<String, Variable>();
 
         var model = new Model();
         for (Constraint<?> constraint : constraints.getConstraints()) {
             var variables = constraint.variables();
-            for (Variable variable : variables) {
-                vars.computeIfAbsent(variable.name(), (n) -> model.intVar(n, 0, Integer.MAX_VALUE - 1, true));
+            for (ConstraintVar variable : variables) {
+                if (variable instanceof IVar i) {
+                    // TODO: not zero
+                    vars.computeIfAbsent(variable.name(), (name) -> model.intVar(name, 0, Integer.MAX_VALUE - 1, true));
+                }
+                else if (variable instanceof DVar d) {
+                    // TODO: not zero
+                    // TODO: not MAX_VALUE / 2--learn some floating point, JUSTIN
+                    // TODO: bad value for precision
+                    vars.computeIfAbsent(variable.name(), (name) -> model.realVar(name, 0, Double.MAX_VALUE / 2, .00000001d));
+                }
             }
             var condition = constraint.condition();
             var targetVar = vars.get(constraint.variable().name());
-            if (condition.source() instanceof Variable v) {
-                ConstraintOperator<?> operator = condition.operator();
-                model.arithm(targetVar, condition.operator().chocoArithmRep(), vars.get(v.name())).reify();
+            if (condition.source() instanceof ConstraintVar v) {
+                if (targetVar instanceof IntVar i && v instanceof IVar i2) {
+                    model.arithm(i, condition.operator().chocoArithmRep(), (IntVar) vars.get(i2.name())).reify();
+                }
+                else if (targetVar instanceof RealVar r && v instanceof DVar d2) {
+                    // TODO: actually constrain RealVar values
+                }
             } else if (condition.source() instanceof ConstantValue<?> c) {
-                model.arithm(targetVar, condition.operator().chocoArithmRep(), (Integer) c.t()).reify();
+                if (targetVar instanceof IntVar i && c.t() instanceof Integer i2) {
+                    model.arithm(i, condition.operator().chocoArithmRep(), i2).reify();
+                }
+                else {
+                    // TODO: actually constrain RealVar values
+                }
             }
         }
 
         var solver = model.getSolver();
 
         for (var i = 0; i < 100; i++) {
-            solver.findSolution();
-            var v1Soln = vars.get(cVars.getLeft().name()).getValue();
-            var v2Soln = vars.get(cVars.getRight().name()).getValue();
+            solver.findSolution(); // TODO: don't assume solution exists
+            var solnVar1 = vars.get(cVars.getLeft().name());
+            var solnVar2 = vars.get(cVars.getRight().name());
 
-            if (!test.apply(v1Soln, v2Soln)) {
-                return Optional.of(Pair.of(v1Soln, v2Soln));
+            T o1 = (T) extractValue(solnVar1);
+            S o2 = (S) extractValue(solnVar2);
+
+            if (null == o1 || null == o2) {
+                continue;
             }
+            if (!test.apply(o1, o2)) {
+                return Optional.of(Pair.of(o1, o2));
+            }
+
         }
 
         return Optional.empty();
     }
 
-    public static void main(String[] args) {
-        var vars = intVar().lt(intVar());
-        vars.getLeft().boundBy(0, 5);
-        vars.getRight().boundBy(0, 20);
-
-
-        System.out.println(check(vars, (a, b) -> (b - a) < 5));
-
-        System.out.println(Check.check((Integer x) -> x + 2, Integer.class).isMonotonic());
+    private static Object extractValue(Variable solnVar1) {
+        if (solnVar1 instanceof IntVar i1) {
+            return i1.getValue();
+        }
+        else {
+            return null;
+        }
     }
 }

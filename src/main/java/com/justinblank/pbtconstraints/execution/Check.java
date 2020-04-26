@@ -1,8 +1,5 @@
 package com.justinblank.pbtconstraints.execution;
 
-import com.justinblank.pbtconstraints.variables.IVar;
-import com.justinblank.pbtconstraints.variables.Variable;
-
 import java.util.function.Function;
 
 public class Check {
