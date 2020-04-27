@@ -11,6 +11,11 @@ assertTrue(operator((Integer x) -> x % 2, Integer.class).isIdempotent());
 
 Function<Integer, Integer> func = x -> x % 2 == 0 ? x / 2 : 3 * x + 1;
 assertFalse(fn(func, Integer.class).isMonotonic());
+
+// definition of log here
+assertTrue(operator(log, Integer.class).hasFixedPoint());
+
+assertTrue(fn(String::valueOf, Integer.class).decodes(Integer::parseInt));
 ```
 
 Constructing generators:

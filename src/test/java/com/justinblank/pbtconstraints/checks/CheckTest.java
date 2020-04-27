@@ -57,4 +57,9 @@ public class CheckTest {
     public void testCheckHasFixedPointFails() {
         assertFalse(operator((Integer x) -> x + 1, Integer.class).hasFixedPoint());
     }
+
+    @Test
+    public void testCheckEncodes() {
+        assertTrue(fn(String::valueOf, Integer.class).decodes(Integer::parseInt));
+    }
 }

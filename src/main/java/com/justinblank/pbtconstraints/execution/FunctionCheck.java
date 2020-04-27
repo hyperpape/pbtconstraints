@@ -36,4 +36,14 @@ public class FunctionCheck<T, S extends Comparable<S>> {
         });
         return result.isEmpty();
     }
+
+    public <P extends ConstraintVar<P>> boolean decodes(Function<S, T> encoder) {
+        ConstraintVar<P> var1 = ConstraintVar.fromClass(getC1());
+        Optional<T> result = Execute.falsify(var1, (T t) -> {
+            S decoded = getFunc().apply(t);
+            T encoded = encoder.apply(decoded);
+            return encoded.equals(t);
+        });
+        return result.isEmpty();
+    }
 }
