@@ -9,7 +9,10 @@ import java.util.Set;
 
 public class ConstraintSet {
 
-    public ConstraintSet(IVar v1) {
+    public ConstraintSet(ConstraintVar<?> v1) {
+        for (Condition<?> condition : v1.conditions()) {
+            addConstraint(new Constraint(v1, condition));
+        }
     }
 
     public ConstraintSet(ConstraintVar<?> v1, ConstraintVar<?> v2) {

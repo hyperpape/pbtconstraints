@@ -6,8 +6,23 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.Optional;
 import java.util.function.Function;
 
-// TODO: record can't have package private constructor?
-public record FunctionCheck<T, S extends Comparable<S>>(Function<T, S> func, Class<?> c1) {
+public class FunctionCheck<T, S extends Comparable<S>> {
+
+    private final Function<T, S> func;
+    private final Class<?> c1;
+
+    FunctionCheck(Function<T, S> func, Class<?> c1) {
+        this.func = func;
+        this.c1 = c1;
+    }
+
+    protected Function<T, S> getFunc() {
+        return func;
+    }
+
+    protected Class<?> getC1() {
+        return c1;
+    }
 
     public <P extends ConstraintVar<P>> boolean isMonotonic() {
         ConstraintVar<P> var1 = ConstraintVar.fromClass(c1);

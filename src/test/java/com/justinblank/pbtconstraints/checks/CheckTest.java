@@ -1,11 +1,11 @@
 package com.justinblank.pbtconstraints.checks;
 
-import com.justinblank.pbtconstraints.execution.Check;
 import org.junit.Test;
 
 import java.util.function.Function;
 
-import static com.justinblank.pbtconstraints.execution.Check.check;
+import static com.justinblank.pbtconstraints.execution.Check.fn;
+import static com.justinblank.pbtconstraints.execution.Check.operator;
 import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -13,22 +13,34 @@ public class CheckTest {
 
     @Test
     public void testCheckMonotonicInteger() {
-        assertTrue(check((Integer x) -> x + 2, Integer.class).isMonotonic());
+        assertTrue(fn((Integer x) -> x + 2, Integer.class).isMonotonic());
     }
 
     @Test
     public void testCheckNonMonotonicFunctionIsntMonotonic() {
-        Function<Integer, Integer> fn = x -> x % 2 == 0 ? x / 2 : 3 * x + 1;
-        assertFalse(check(fn, Integer.class).isMonotonic());
+        Function<Integer, Integer> func = x -> x % 2 == 0 ? x / 2 : 3 * x + 1;
+        assertFalse(fn(func, Integer.class).isMonotonic());
     }
 
     @Test
     public void testCheckMonotonicDouble() {
-        assertTrue(check((Double x) -> x + 2, Double.class).isMonotonic());
+        assertTrue(fn((Double x) -> x + 2, Double.class).isMonotonic());
     }
 
     @Test(expected = Exception.class)
     public void testCheckComplainsAboutMismatchedClass() {
-        assertTrue(check((Double x) -> x + 2, Integer.class).isMonotonic());
+        assertTrue(fn((Double x) -> x + 2, Integer.class).isMonotonic());
+    }
+
+    @Test
+    public void testCheckIdempotency() {
+        assertTrue(operator((Integer x) -> x % 2, Integer.class).isIdempotent());
+        assertFalse(operator((Integer x) -> x + 1, Integer.class).isIdempotent());
+    }
+
+    @Test
+    public void testCheckInvolution() {
+        assertTrue(operator((Integer x) -> x * -1, Integer.class).isInvolution());
+        assertFalse(operator((Integer x) -> x * 2, Integer.class).isInvolution());
     }
 }

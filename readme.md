@@ -7,8 +7,10 @@ Use:
 
 Checking properties:
 ```
-Function<Integer, Integer> fn = x -> x % 2 == 0 ? x / 2 : 3 * x + 1;
-assertFalse(check(fn, Integer.class).isMonotonic());
+assertTrue(operator((Integer x) -> x % 2, Integer.class).isIdempotent());
+
+Function<Integer, Integer> func = x -> x % 2 == 0 ? x / 2 : 3 * x + 1;
+assertFalse(fn(func, Integer.class).isMonotonic());
 ```
 
 Constructing generators:
