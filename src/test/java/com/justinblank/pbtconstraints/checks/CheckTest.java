@@ -43,4 +43,18 @@ public class CheckTest {
         assertTrue(operator((Integer x) -> x * -1, Integer.class).isInvolution());
         assertFalse(operator((Integer x) -> x * 2, Integer.class).isInvolution());
     }
+
+    @Test
+    public void testCheckHasFixedPoint() {
+        Function<Integer, Integer> log = x -> {
+            double d = Math.max(0, Math.floor(Math.log(x)));
+            return (int) d;
+        };
+        assertTrue(operator(log, Integer.class).hasFixedPoint());
+    }
+
+    @Test
+    public void testCheckHasFixedPointFails() {
+        assertFalse(operator((Integer x) -> x + 1, Integer.class).hasFixedPoint());
+    }
 }

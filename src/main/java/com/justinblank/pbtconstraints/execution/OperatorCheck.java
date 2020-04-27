@@ -29,4 +29,20 @@ public class OperatorCheck<T extends Comparable<T>> extends FunctionCheck<T, T> 
         });
         return result.isEmpty();
     }
+
+    public boolean hasFixedPoint() {
+        ConstraintVar<?> var1 = ConstraintVar.fromClass(getC1());
+        Optional<T> result = Execute.falsify(var1, (T x) -> {
+            T current = x;
+            for (int i = 0; i < 65; i++) {
+                T next = getFunc().apply(current);
+                if (next.equals(current)) {
+                    return true;
+                }
+                current = next;
+            }
+            return false;
+        });
+        return result.isEmpty();
+    }
 }
